@@ -8,7 +8,8 @@
 
 <body>
     <p>Image</p>
-    <img id="scream" src="https://www.runoob.com/try/demo_source/img_the_scream.jpg" alt="The Scream" width="220" height="277">
+    <img id="scream" src="https://www.runoob.com/try/demo_source/img_the_scream.jpg" alt="The Scream" width="220"
+        height="277">
     <p>Canvas:</p>
     <canvas id="myCanvas" width="300" height="300">
         您的浏览器不支持 HTML5 canvas 标签。</canvas>
@@ -30,8 +31,8 @@
             let [x, y] = getPoint(e)
             let clipX = x - bigRange > 0 ? x - bigRange : 0
             let clipY = y - bigRange > 0 ? y - bigRange : 0
-            ctx.clearRect(0, 0, 300, 300)
-            ctx.drawImage(img, clipX, clipY, bigRange * 2, bigRange * 2, 0, 0, 300, 300);
+            ctx.clearRect(0, 0, c.width, c.height)
+            ctx.drawImage(img, clipX, clipY, bigRange * 2, bigRange * 2, 0, 0, c.width, c.height);
         }
         img.onmouseout = function () {
             ctx.clearRect(0, 0, 300, 300)
