@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>粒子</title>
+</head>
+
+<body>
+
+    <canvas id="canvas" width="800" height="600" style="border:1px solid #d3d3d3;">
+        您的浏览器不支持 HTML5 canvas 标签。
+    </canvas>
+    <script>
+        var canvas = document.getElementById("canvas");
+        var ctx = canvas.getContext("2d");
+        let w = canvas.width = canvas.offsetWidth;
+        let h = canvas.height = canvas.offsetHeight;
+        let circles = [];
+        let count = 60
+
+        class Circle {
+            constructor(x, y) {
+                this.x = x
+                this.y = y
+                this.r = 4
+                this.moveX = Math.random() >= 0.5 ? 0 - Math.random() : Math.random()
+                this.moveY = Math.random() >= 0.5 ? 0 - Math.random() : Math.random()
+            }
+            drawCircle(ctx) {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.r, 0, 360)
+                ctx.closePath();
+                ctx.fillStyle = 'pink';
+                ctx.fill();
+            }
+            drawLine(ctx, otherCircle) {
+                let distance = Math.sqrt(Math.pow((this.x - otherCircle.x), 2) + Math.pow((this.y - otherCircle.y), 2))
+                if (distance < 150) {
+                    var gradient = ctx.createLinearGradient(this.x, this.y, otherCircle.x, otherCircle.y);
+                    gradient.addColorStop("0", "lightgreen");
+                    gradient.addColorStop("1.0", "gold");
+                    ctx.moveTo(this.x, this.y)
+                    ctx.lineTo(otherCircle.x, otherCircle.y)
+                    ctx.strokeStyle = gradient
+                    ctx.stroke();
+                }
+            }
+            move(w, h) {
+                this.moveX = (this.x < w && this.x > 0) ? this.moveX : -this.moveX
+                this.moveY = (this.y < h && this.y > 0) ? this.moveY : -this.moveY
+                this.x += this.moveX / 2;
+                this.y += this.moveY / 2;
+            }
+        }
+
+        class currentCircle extends Circle {
+            constructor(x, y) {
+                super(x, y)
+            }
+            drawCircle(ctx) {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, 8, 0, 2 * Math.PI);
+                ctx.closePath();
+                ctx.fillStyle = 'red'
+                ctx.fill();
+            }
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, w, h)
+            for (let i = 0; i < circles.length; i++) {
+                circles[i].move(w, h)
+                circles[i].drawCircle(ctx)
+                for (let j = i + 1; j < circles.length; j++) {
+                    circles[i].drawLine(ctx, circles[j])
+                }
+            }
+            if (current_circle.x) {
+                current_circle.drawCircle(ctx)
+                for (let i = 0; i < circles.length; i++) {
+                    current_circle.drawLine(ctx, circles[i])
+                }
+            }
+            requestAnimationFrame(draw)
+        }
+        let current_circle = new currentCircle(0, 0)
+        window.addEventListener('load', function () {
+            for (let i = 0; i < count; i++) {
+                circles.push(new Circle(Math.random() * w, Math.random() * h))
+            }
+            draw()
+        })
+        window.onmousemove = function (e) {
+            e = e || window.event
+            current_circle.x = e.clientX
+            current_circle.y = e.clientY
+        }
+        window.onmouseout = function (e) {
+            current_circle.x = null
+            current_circle.y = null
+        }
+    </script>
+
+</body>
+
+</html>

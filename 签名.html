@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>签名</title>
+</head>
+
+<body>
+
+    <canvas id="myCanvas" width="600" height="400" style="border:1px solid #d3d3d3">
+        您的浏览器不支持 HTML5 canvas 标签。
+    </canvas>
+    <br />
+    <button id="draw" onclick="clickDraw()">绘画</button>
+    <button id="clear" onclick="clickClear()">清空</button>
+    <button id="eraser" onclick="clickEraser()">橡皮擦</button>
+    <button id="save" onclick="download()">保存</button>
+    <a></a>
+    <script>
+        var c = document.getElementById("myCanvas");
+        var ctx = c.getContext("2d");
+        let events = ['mousedown', 'mousemove', 'mouseup']
+        // 保存图片的文件名
+        let fileName = 'canvas'
+        // 橡皮擦长宽
+        let range = 20
+        let draw, eraser
+
+        // 点击绘画
+        function clickDraw() {
+            if (draw) return
+            draw = new Draw()
+            draw.init()
+        }
+        // 清空画布
+        function clickClear() {
+            ctx.clearRect(0, 0, c.width, c.height)
+        }
+        // 橡皮擦
+        function clickEraser() {
+            if (eraser) return
+            eraser = new Eraser()
+            eraser.init()
+        }
+        // 保存为图片
+        function download() {
+            let url = c.toDataURL()
+            let a = document.querySelectorAll('a')[0]
+            a.href = url
+            a.download = fileName
+            a.click()
+        }
+        // 获取鼠标相对canvas坐标
+        function getPoint(event) {
+            const evt = event || window.event
+            const coverPos = c.getBoundingClientRect();
+            const mouseX = evt.clientX - coverPos.left;
+            const mouseY = evt.clientY - coverPos.top;
+            return [mouseX, mouseY]
+        }
+        class Draw {
+            init() {
+                if (eraser) {
+                    c.removeEventListener(events[0], eraser.startEraser);
+                    Eraser.endEraser()
+                    eraser = null
+                }
+                c.addEventListener(events[0], this.startDraw);
+            }
+            startDraw() {
+                ctx.beginPath()
+                c.addEventListener(events[1], Draw.moveDraw);
+                c.addEventListener(events[2], Draw.endDraw);
+            }
+            static moveDraw(event) {
+                event.preventDefault();
+                let arr = getPoint(event)
+                ctx.lineWidth = "5";
+                ctx.lineCap = "round"
+                ctx.shadowBlur = "1"
+                ctx.shadowColor = "#000"
+                ctx.lineTo(arr[0], arr[1]);
+                ctx.stroke();
+            }
+            static endDraw() {
+                c.removeEventListener(events[1], Draw.moveDraw);
+                c.removeEventListener(events[2], Draw.endDraw);
+            }
+        }
+        class Eraser {
+            init() {
+                if (draw) {
+                    c.removeEventListener(events[0], draw.startDraw);
+                    Draw.endDraw()
+                    draw = null
+                }
+                c.addEventListener(events[0], this.startEraser);
+            }
+            startEraser() {
+                c.addEventListener(events[1], Eraser.moveEraser)
+                c.addEventListener(events[2], Eraser.endEraser)
+            }
+            static moveEraser(event) {
+                event.preventDefault();
+                let arr = getPoint(event)
+                ctx.clearRect(arr[0] - range / 2, arr[1] - range / 2, range, range)
+            }
+            static endEraser() {
+                c.removeEventListener(events[1], Eraser.moveEraser);
+                c.removeEventListener(events[2], Eraser.endEraser);
+            }
+        }      
+    </script>
+
+</body>
+
+</html>

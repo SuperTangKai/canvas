@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+
+<head> 
+    <meta charset="utf-8"> 
+    <title>放大镜</title> 
+</head>
+
+<body>
+    <p>Image</p>
+    <img id="scream" src="https://www.runoob.com/try/demo_source/img_the_scream.jpg" alt="The Scream" width="220" height="277">
+    <p>Canvas:</p>
+    <canvas id="myCanvas" width="300" height="300">
+        您的浏览器不支持 HTML5 canvas 标签。</canvas>
+
+    <script>
+
+        var c = document.getElementById("myCanvas");
+        var ctx = c.getContext("2d");
+        var img = document.getElementById("scream");
+        var bigRange = 30
+        function getPoint(e) {
+            let evt = e || window.event
+            let x = evt.clientX - img.getBoundingClientRect().left
+            let y = evt.clientY - img.getBoundingClientRect().top
+            return [x, y]
+        }
+        img.onmousemove = function (e) {
+            img.style.cursor = "move";
+            let [x, y] = getPoint(e)
+            let clipX = x - bigRange > 0 ? x - bigRange : 0
+            let clipY = y - bigRange > 0 ? y - bigRange : 0
+            ctx.clearRect(0, 0, 300, 300)
+            ctx.drawImage(img, clipX, clipY, bigRange * 2, bigRange * 2, 0, 0, 300, 300);
+        }
+        img.onmouseout = function () {
+            ctx.clearRect(0, 0, 300, 300)
+        }
+    </script>
+
+</body>
+
+</html>
